@@ -14,7 +14,9 @@ defmodule MissionControl.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: MissionControl.PubSub},
       # Start the Endpoint (http/https)
-      MissionControlWeb.Endpoint
+      MissionControlWeb.Endpoint,
+      MissionControl.ServerMetricsGenerator,
+      MissionControl.RevenueMetricsGenerator
       # Start a worker by calling: MissionControl.Worker.start_link(arg)
       # {MissionControl.Worker, arg}
     ]

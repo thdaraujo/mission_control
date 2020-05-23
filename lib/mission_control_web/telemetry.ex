@@ -41,7 +41,14 @@ defmodule MissionControlWeb.Telemetry do
       summary("vm.memory.total", unit: {:byte, :kilobyte}),
       summary("vm.total_run_queue_lengths.total"),
       summary("vm.total_run_queue_lengths.cpu"),
-      summary("vm.total_run_queue_lengths.io")
+      summary("vm.total_run_queue_lengths.io"),
+
+      # Financial Metrics
+      summary("mission_control.revenue.amount"),
+
+      # Server Metrics
+      summary("mission_control.server.usage")
+
     ]
   end
 
