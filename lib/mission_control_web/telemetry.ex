@@ -48,7 +48,6 @@ defmodule MissionControlWeb.Telemetry do
 
       # Server Metrics
       summary("mission_control.server.usage")
-
     ]
   end
 

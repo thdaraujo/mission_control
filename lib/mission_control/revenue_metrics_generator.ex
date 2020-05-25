@@ -15,7 +15,7 @@ defmodule MissionControl.RevenueMetricsGenerator do
   @impl GenServer
   def handle_info(:work, state) do
     :telemetry.execute([:mission_control, :revenue], %{
-      amount: Enum.random(0..100000),
+      amount: Enum.random(0..100_000)
     })
 
     schedule_work()
