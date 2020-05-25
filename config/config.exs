@@ -29,3 +29,11 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
+
+stripe_secret_key =
+  System.get_env("STRIPE_SECRET_KEY") ||
+    raise """
+    environment variable STRIPE_SECRET_KEY is missing.
+    """
+
+config :stripity_stripe, api_key: stripe_secret_key
