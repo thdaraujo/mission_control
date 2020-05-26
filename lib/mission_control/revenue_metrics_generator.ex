@@ -2,7 +2,7 @@ defmodule MissionControl.RevenueMetricsGenerator do
   use GenServer
 
   def start_link(initial_state) do
-    GenServer.start_link(__MODULE__, initial_state, name: __MODULE__)
+    GenServer.start_link(__MODULE__, 0, name: __MODULE__)
   end
 
   @impl GenServer
@@ -14,17 +14,24 @@ defmodule MissionControl.RevenueMetricsGenerator do
 
   @impl GenServer
   def handle_info(:work, state) do
-    :telemetry.execute([:mission_control, :revenue], %{
-      amount: Enum.random(0..100_000)
-    })
+    current_ts = :os.system_time(:millisecond)
+    # TODO send state
+    charges = MissionControl.Stripe.charges(0)
+
+    for charge <- charges, do: measure(charge)
 
     schedule_work()
 
-    {:noreply, state}
+    {:noreply, current_ts}
   end
 
   defp schedule_work do
-    # 2 seconds
     Process.send_after(self(), :work, 2 * 1000)
+  end
+
+  defp measure(charge) do
+    :telemetry.execute([:revenue], %{
+      charge: charge.amount
+    })
   end
 end

@@ -44,10 +44,8 @@ defmodule MissionControlWeb.Telemetry do
       summary("vm.total_run_queue_lengths.io"),
 
       # Financial Metrics
-      summary("mission_control.revenue.amount"),
-
-      # Server Metrics
-      summary("mission_control.server.usage")
+      # summary("revenue.charge"),
+      sum("revenue.charge")
     ]
   end
 
