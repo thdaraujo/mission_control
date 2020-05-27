@@ -1,7 +1,7 @@
 defmodule MissionControl.RevenueMetricsGenerator do
   use GenServer
 
-  def start_link(initial_state) do
+  def start_link(_initial_state) do
     GenServer.start_link(__MODULE__, 0, name: __MODULE__)
   end
 
