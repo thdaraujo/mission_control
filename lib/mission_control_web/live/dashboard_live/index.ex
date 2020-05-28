@@ -1,14 +1,21 @@
 defmodule MissionControlWeb.DashboardLive.Index do
   use MissionControlWeb, :live_view
-  alias Contex.{Sparkline}
+  alias Contex.{Sparkline, BarChart, Plot, Dataset}
 
   def render(assigns) do
     ~L"""
-      <h3>Simple Sparkline Example</h3>
+      <h1>Mission Control</h1>
       <div class="container">
         <div class="row">
           <div class="column">
-
+            <h2>Financial Metrics</h2>
+            <h3>Revenue</h3>
+            <%= make_plot(@charges_data) %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <h3>Server Metrics</h3>
             <form phx-change="chart_options_changed">
               <label for="refresh_rate">Refresh Rate</label>
               <input type="number" name="refre  sh_rate" id="refresh_rate" placeholder="Enter refresh rate" value=<%= @chart_options.refresh_rate %>>
@@ -16,13 +23,8 @@ defmodule MissionControlWeb.DashboardLive.Index do
               <label for="number_of_points">Number of points</label>
               <input type="number" name="number_of_points" id="number_of_points" placeholder="Enter #series" value=<%= @chart_options.number_of_points %>>
             </form>
-
-            <%= make_plot(@test_data) %>Something we're monitoring
-            <br/>
-            <%= make_red_plot(@test_data) %>Something important we're monitoring
-
-            <p>And here's the data:</p>
-            <%= inspect(@test_data) %>
+            <%= make_red_plot(@test_data) %>
+            <p>
           </div>
         </div>
       </div>
@@ -35,6 +37,7 @@ defmodule MissionControlWeb.DashboardLive.Index do
       |> assign(chart_options: %{refresh_rate: 1000, number_of_points: 50})
       |> assign(process_counts: [0])
       |> make_test_data()
+      |> add_charges_data
 
     if connected?(socket),
       do: Process.send_after(self(), :tick, socket.assigns.chart_options.refresh_rate)
@@ -76,12 +79,14 @@ defmodule MissionControlWeb.DashboardLive.Index do
   defp make_plot(data) do
     plot = Sparkline.new(data)
 
-    %{plot | height: 100, width: 600}
+    %{plot | height: 100, width: 800}
     |> Sparkline.draw()
   end
 
   defp make_red_plot(data) do
-    Sparkline.new(data)
+    plot = Sparkline.new(data)
+
+    %{plot | height: 100, width: 800}
     |> Sparkline.colours("#fad48e", "#ff9838")
     |> Sparkline.draw()
   end
@@ -95,4 +100,32 @@ defmodule MissionControlWeb.DashboardLive.Index do
 
     assign(socket, test_data: result)
   end
+
+  defp add_charges_data(socket) do
+    charges_data =
+      MissionControl.Stripe.charges()
+      |> Enum.map(fn charge -> charge.amount end)
+
+    assign(socket, charges_data: charges_data)
+  end
+
+  # def basic_plot(data) do
+  #   charges =
+  #     MissionControl.Stripe.charges()
+  #     |> Enum.map(fn charges -> {DateTime.to_unix(charges.created), charges.amount} end)
+
+  #   dataset = Dataset.new(charges, ["x", "y"])
+
+  #   plot_content =
+  #     BarChart.new(dataset)
+  #     |> BarChart.data_labels(true)
+  #     |> BarChart.orientation(:vertical)
+  #     |> BarChart.colours(["ff9838", "fdae53", "fbc26f", "fad48e", "fbe5af", "fff5d1"])
+
+  #   plot =
+  #     Plot.new(800, 400, plot_content)
+  #     |> Plot.titles("Stripe", "Charges")
+
+  #   Plot.to_svg(plot)
+  # end
 end

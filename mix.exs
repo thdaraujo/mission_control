@@ -48,7 +48,8 @@ defmodule MissionControl.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:stripity_stripe, "~> 2.8.0"},
-      {:contex, git: "https://github.com/mindok/contex"}
+      {:contex, git: "https://github.com/mindok/contex"},
+      {:timex, "~> 3.6"}
     ]
   end
 
