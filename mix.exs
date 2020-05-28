@@ -47,7 +47,8 @@ defmodule MissionControl.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:stripity_stripe, "~> 2.8.0"}
+      {:stripity_stripe, "~> 2.8.0"},
+      {:contex, git: "https://github.com/mindok/contex"}
     ]
   end
 

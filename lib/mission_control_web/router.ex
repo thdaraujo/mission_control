@@ -25,6 +25,9 @@ defmodule MissionControlWeb.Router do
 
     live "/users/:id", UserLive.Show, :show
     live "/users/:id/show/edit", UserLive.Show, :edit
+
+    # , :index
+    live "/control", DashboardLive.Index
   end
 
   # Other scopes may use custom stacks.
