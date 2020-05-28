@@ -13,10 +13,10 @@ defmodule MissionControl.RevenueMetricsGenerator do
   end
 
   @impl GenServer
-  def handle_info(:work, state) do
+  def handle_info(:work, _state) do
     current_ts = :os.system_time(:millisecond)
     # TODO send state
-    charges = MissionControl.Stripe.charges(0)
+    charges = MissionControl.Stripe.charges()
 
     for charge <- charges, do: measure(charge)
 
