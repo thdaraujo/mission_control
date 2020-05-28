@@ -20,7 +20,7 @@
   </thead>
   <tbody id="users">
     <%= for user <- @users do %>
-      <tr id="user-<%= user.id %>">
+      <tr id="user-<%= user.id %>" pxh-update="prepend">
         <td><%= user.email %></td>
         <td><%= user.username %></td>
 

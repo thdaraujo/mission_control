@@ -18,7 +18,7 @@ defmodule MissionControl.Accounts do
 
   """
   def list_users do
-    Repo.all(User)
+    Repo.all(from u in User, order_by: [asc: u.id])
   end
 
   @doc """
@@ -53,6 +53,7 @@ defmodule MissionControl.Accounts do
     %User{}
     |> User.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:user_created)
   end
 
   @doc """
@@ -71,6 +72,7 @@ defmodule MissionControl.Accounts do
     user
     |> User.changeset(attrs)
     |> Repo.update()
+    |> broadcast(:user_updated)
   end
 
   @doc """
@@ -100,5 +102,16 @@ defmodule MissionControl.Accounts do
   """
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
+  end
+
+  def subscribe do
+    Phoenix.PubSub.subscribe(MissionControl.PubSub, "users")
+  end
+
+  defp broadcast({:error, _reason} = error, _event), do: error
+
+  defp broadcast({:ok, user}, event) do
+    Phoenix.PubSub.broadcast(MissionControl.PubSub, "users", {event, user})
+    {:ok, user}
   end
 end

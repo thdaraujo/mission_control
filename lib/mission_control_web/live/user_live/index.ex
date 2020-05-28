@@ -6,7 +6,17 @@ defmodule MissionControlWeb.UserLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :users, list_users())}
+    if connected?(socket), do: Accounts.subscribe()
+    {:ok, assign(socket, :users, list_users()), temporary_assigns: [users: []]}
+  end
+
+  @impl true
+  def handle_info({:user_created, user}, socket) do
+    {:noreply, update(socket, :users, fn users -> [users | user] end)}
+  end
+
+  def handle_info({:user_updated, user}, socket) do
+    {:noreply, update(socket, :users, fn users -> [users | user] end)}
   end
 
   @impl true
