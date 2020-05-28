@@ -20,7 +20,12 @@ defmodule MissionControl.Stripe do
 
   defp random_charge!(%Stripe.Customer{id: customer_id}) do
     amount = random(1_000..5_000)
-    Stripe.Charge.create(%{amount: amount, currency: "USD", customer: customer_id})
+
+    Stripe.Charge.create(%{
+      amount: amount,
+      currency: "USD",
+      customer: customer_id
+    })
   end
 
   defp convert_attributes(charge) do
@@ -31,7 +36,7 @@ defmodule MissionControl.Stripe do
   end
 
   defp convert_timestamps(%{created: ts} = charge) do
-    {:ok, created_date} = DateTime.from_unix(ts, :millisecond)
+    {:ok, created_date} = DateTime.from_unix(ts, :second)
     %{charge | created: created_date}
   end
 

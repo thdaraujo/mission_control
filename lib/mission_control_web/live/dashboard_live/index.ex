@@ -9,20 +9,40 @@ defmodule MissionControlWeb.DashboardLive.Index do
         <div class="row">
           <div class="column">
             <h2>Financial Metrics</h2>
-            <h3>Revenue</h3>
-            <%= make_plot(@charges_data) %>
+            <h3>Stripe Revenue (US$ <%= Enum.map(@charges, fn charges -> charges.amount end) |> Enum.sum %>)</h3>
+            <%= make_plot(@charges) %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <h3>Sales</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="charges">
+                <%= for charge <- @charges do %>
+                  <tr id="charge-<%= charge.created %>" pxh-update="prepend">
+                    <td><%= format_date(charge.created) %></td>
+                    <td>US$ <%= charge.amount %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+              <tfoot>
+                <tr>
+                    <th scope="row">Total</th>
+                    <td>US$ <%= Enum.map(@charges, fn charges -> charges.amount end) |> Enum.sum %>)</td>
+                </tr>
+            </tfoot>
+            </table>
           </div>
         </div>
         <div class="row">
           <div class="column">
             <h3>Server Metrics</h3>
-            <form phx-change="chart_options_changed">
-              <label for="refresh_rate">Refresh Rate</label>
-              <input type="number" name="refre  sh_rate" id="refresh_rate" placeholder="Enter refresh rate" value=<%= @chart_options.refresh_rate %>>
-
-              <label for="number_of_points">Number of points</label>
-              <input type="number" name="number_of_points" id="number_of_points" placeholder="Enter #series" value=<%= @chart_options.number_of_points %>>
-            </form>
             <%= make_red_plot(@test_data) %>
             <p>
           </div>
@@ -77,7 +97,8 @@ defmodule MissionControlWeb.DashboardLive.Index do
   end
 
   defp make_plot(data) do
-    plot = Sparkline.new(data)
+    amounts = Enum.map(data, fn charges -> charges.amount end)
+    plot = Sparkline.new(amounts)
 
     %{plot | height: 100, width: 800}
     |> Sparkline.draw()
@@ -102,12 +123,11 @@ defmodule MissionControlWeb.DashboardLive.Index do
   end
 
   defp add_charges_data(socket) do
-    charges_data =
-      MissionControl.Stripe.charges()
-      |> Enum.map(fn charge -> charge.amount end)
-
-    assign(socket, charges_data: charges_data)
+    charges = MissionControl.Stripe.charges()
+    assign(socket, charges: charges)
   end
+
+  defp format_date(date), do: date |> Timex.format!("{YYYY}/{M}/{D}")
 
   # def basic_plot(data) do
   #   charges =
