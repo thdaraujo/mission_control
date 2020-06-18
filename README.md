@@ -27,3 +27,8 @@ Setup .env variables:
 $ cp .env.sample .env
 $ source .env
 ```
+
+To seed the database and stripe:
+```
+$ mix run priv/repo/seeds.exs
+```

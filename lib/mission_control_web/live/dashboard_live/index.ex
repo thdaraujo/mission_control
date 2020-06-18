@@ -2,54 +2,8 @@ defmodule MissionControlWeb.DashboardLive.Index do
   use MissionControlWeb, :live_view
   alias Contex.{Sparkline, BarChart, Plot, Dataset}
 
-  def render(assigns) do
-    ~L"""
-      <h1>Mission Control</h1>
-      <div class="container">
-        <div class="row">
-          <div class="column">
-            <h2>Financial Metrics</h2>
-            <h3>Stripe Revenue (US$ <%= Enum.map(@charges, fn charges -> charges.amount end) |> Enum.sum %>)</h3>
-            <%= make_plot(@charges) %>
-          </div>
-        </div>
-        <div class="row">
-          <div class="column">
-            <h3>Sales</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody id="charges">
-                <%= for charge <- @charges do %>
-                  <tr id="charge-<%= charge.created %>" pxh-update="prepend">
-                    <td><%= format_date(charge.created) %></td>
-                    <td>US$ <%= charge.amount %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-              <tfoot>
-                <tr>
-                    <th scope="row">Total</th>
-                    <td>US$ <%= Enum.map(@charges, fn charges -> charges.amount end) |> Enum.sum %>)</td>
-                </tr>
-            </tfoot>
-            </table>
-          </div>
-        </div>
-        <div class="row">
-          <div class="column">
-            <h3>Server Metrics</h3>
-            <%= make_red_plot(@test_data) %>
-            <p>
-          </div>
-        </div>
-      </div>
-    """
-  end
+  # def render(assigns) do
+  # end
 
   def mount(_params, _session, socket) do
     socket =
@@ -57,7 +11,7 @@ defmodule MissionControlWeb.DashboardLive.Index do
       |> assign(chart_options: %{refresh_rate: 1000, number_of_points: 50})
       |> assign(process_counts: [0])
       |> make_test_data()
-      |> add_charges_data
+      |> add_data
 
     if connected?(socket),
       do: Process.send_after(self(), :tick, socket.assigns.chart_options.refresh_rate)
@@ -96,8 +50,19 @@ defmodule MissionControlWeb.DashboardLive.Index do
     end
   end
 
+  defp calculate_mrr(subscriptions) do
+    total = Enum.map(subscriptions, fn subscription -> subscription.amount end) |> Enum.sum()
+    qty = Enum.count(subscriptions)
+
+    total / qty
+
+    # TODO
+    # Enum.group_by(subscriptions, fn subscription -> month_year(subscription.created), fn g -> )
+  end
+
   defp make_plot(data) do
-    amounts = Enum.map(data, fn charges -> charges.amount end)
+    # Enum.map(data, fn subscription -> subscription.amount end)
+    amounts = [200, 220, 240, 290, 250, 256, 400, 512, 500, 550, 570, 680, 700, 750]
     plot = Sparkline.new(amounts)
 
     %{plot | height: 100, width: 800}
@@ -122,12 +87,14 @@ defmodule MissionControlWeb.DashboardLive.Index do
     assign(socket, test_data: result)
   end
 
-  defp add_charges_data(socket) do
-    charges = MissionControl.Stripe.charges()
-    assign(socket, charges: charges)
+  defp add_data(socket) do
+    subscriptions = MissionControl.Stripe.subscriptions()
+    assign(socket, subscriptions: subscriptions)
   end
 
   defp format_date(date), do: date |> Timex.format!("{YYYY}/{M}/{D}")
+
+  defp year_month(date), do: date |> Timex.format!("{YYYY}/{M}")
 
   # def basic_plot(data) do
   #   charges =

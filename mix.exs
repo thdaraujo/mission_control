@@ -49,7 +49,8 @@ defmodule MissionControl.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:stripity_stripe, "~> 2.8.0"},
       {:contex, git: "https://github.com/mindok/contex"},
-      {:timex, "~> 3.6"}
+      {:timex, "~> 3.6"},
+      {:faker, "~> 0.13"}
     ]
   end
 

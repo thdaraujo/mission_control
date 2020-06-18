@@ -1,0 +1,41 @@
+<h1>Mission Control</h1>
+<div class="container">
+    <div class="row">
+        <div class="column">
+            <h2>Financial Metrics</h2>
+            <h3>MRR (US$ <%= calculate_mrr(@subscriptions) %>)</h3>
+            <%= make_plot(@subscriptions) %>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+        <h3>Traffic</h3>
+            <p>
+                <%= make_red_plot(@test_data) %>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+        <h3>Sales</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Plan Interval</th>
+                <th>Plan Total Amount</th>
+            </tr>
+            </thead>
+            <tbody id="subscriptions">
+                <%= for subscription <- @subscriptions do %>
+                    <tr id="subscription-<%= subscription.created %>" pxh-update="prepend">
+                        <td><%= format_date(subscription.created) %></td>
+                        <td><%= subscription.interval %></td>
+                        <td>US$ <%= subscription.plan_amount %></td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>

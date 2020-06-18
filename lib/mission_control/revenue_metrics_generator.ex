@@ -16,9 +16,9 @@ defmodule MissionControl.RevenueMetricsGenerator do
   def handle_info(:work, _state) do
     current_ts = :os.system_time(:millisecond)
     # TODO send state
-    charges = MissionControl.Stripe.charges()
+    subscriptions = MissionControl.Stripe.subscriptions()
 
-    for charge <- charges, do: measure(charge)
+    # for subscription <- subscriptions, do: measure(subscription)
 
     schedule_work()
 
@@ -26,12 +26,6 @@ defmodule MissionControl.RevenueMetricsGenerator do
   end
 
   defp schedule_work do
-    Process.send_after(self(), :work, 10 * 1000)
-  end
-
-  defp measure(charge) do
-    :telemetry.execute([:revenue], %{
-      charge: charge.amount
-    })
+    Process.send_after(self(), :work, 60 * 1000)
   end
 end
